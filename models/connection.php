@@ -2,7 +2,7 @@
 
 class Connector
 {
-	private $DB_NAME = 'colletta_alimentare';
+	private $DB_NAME = 'stracolletta_alimentare';
 	//local
 	private $DB_HOST = 'localhost';
 	private $DB_USER = 'colletta';

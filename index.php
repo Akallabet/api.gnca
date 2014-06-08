@@ -83,7 +83,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                     $values->id_area= $_SESSION['user']['id_area'];
                 }
             }
-            else if($method=='update' || $method=='insert')
+            else if($method=='update' || $method=='save')
             {
                 if($_SESSION['user']['privilegi']==1)
                 {
@@ -120,6 +120,13 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
             require_once("./models/capi_equipe.php");
             if(checkPermissions($token,4))
                 $obj= new CapiEquipe();
+            if($method=='update' || $method=='insert')
+            {
+                if($_SESSION['user']['privilegi']==1)
+                {
+                    deleteCache();
+                }
+            }
             break;
         case 'capi_equipe_supermercati':
             require_once("./models/capi_equipe_supermercati.php");

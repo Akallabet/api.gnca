@@ -4,6 +4,7 @@ require_once("model.php");
 class TableColletta
 {
 	public $id;
+	public $nome;
 	public $anno;
 	public $data;
 	public $attiva;

@@ -46,7 +46,7 @@ class Users extends Model
 
 	function login($username, $password)
 	{
-		$query= "SELECT * FROM {$this->table} WHERE username='{$username}' AND password='{$password}'";
+		$query= "SELECT * FROM {$this->table} WHERE username='{$username}' AND password='{$password}' AND attivo='1'";
 		$res= $this->executeStandardQuery($query);
 		return $res;
 	}
