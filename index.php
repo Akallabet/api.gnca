@@ -238,6 +238,14 @@ $app->get('/:token/info/update/:year', function($token, $year) use($app){
     echo json_encode(array("result"=>$res));
 });
 
+$app->get('/:token/cache/delete', function($token){
+    if(checkPermissions($token,1))
+    {
+        deleteCache();
+    }
+    echo json_encode(array("result"=>$res));
+});
+
 $app->get('/:token/files/:year', function($token, $year){
     echo json_encode(array("files"=>getUploadedFiles()));
 });
