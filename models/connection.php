@@ -9,9 +9,9 @@ class Connector
 	private $DB_PASS = '171882109';
 
 	//remote
-	//private $DB_HOST = '192.186.204.169';
-	//private $DB_USER = 'gnca';
-	//private $DB_PASS = 'gnca2013';
+	// private $DB_HOST = '192.186.204.169';
+	// private $DB_USER = 'gnca1';
+	// private $DB_PASS = '1a2b3c4d';
 	//public $connection;
 
 	function Connector()

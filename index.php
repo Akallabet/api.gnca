@@ -85,10 +85,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
             }
             else if($method=='update' || $method=='save')
             {
-                if($_SESSION['user']['privilegi']==1)
-                {
-                    deleteCache();
-                }
+                deleteCache();
             }
             if(checkPermissions($token,4))
                 $obj= new Supermercati();
@@ -108,6 +105,14 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
             break;
         case 'comuni':
             require_once("./models/comuni.php");
+
+            if($method=='get')
+            {
+                if($_SESSION['user']['privilegi']>1)
+                {
+                    $values->id_area= $_SESSION['user']['id_area'];
+                }
+            }
             if(checkPermissions($token,4))
                 $obj= new Comuni();
             break;
@@ -239,9 +244,11 @@ $app->get('/:token/info/update/:year', function($token, $year) use($app){
 });
 
 $app->get('/:token/cache/delete', function($token){
+    $res= false;
     if(checkPermissions($token,1))
     {
         deleteCache();
+        $res=true;
     }
     echo json_encode(array("result"=>$res));
 });

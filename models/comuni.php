@@ -6,6 +6,8 @@ class ComuniTable
 	public $id;
 	public $nome;
 	public $provincia;
+	public $id_provincia;
+	public $id_area;
 
 	public function __construct()
 	{
@@ -21,7 +23,7 @@ class Comuni extends Model
 		$this->table= 'comuni';
 		$this->table_model= "ComuniTable";
 		$this->join_statement= " JOIN province B ON A.id_provincia=B.id";
-		$this->select_statement= "A.id, A.nome, A.id_provincia, B.nome as provincia";
+		$this->select_statement= "A.id, A.nome, A.id_provincia, B.nome as provincia, A.id_area";
 		$this->statements= array(
 			"GET_ALL"=>"SELECT {$this->select_statement} FROM {$this->table} A {$this->join_statement}",
 			"GET_BY_ID"=>"SELECT $this->select_statement FROM {$this->table} A {$this->join_statement} WHERE A.id=?",
@@ -50,7 +52,8 @@ class Comuni extends Model
 				else
 					$par[]= "A.{$key} = {$value}";
 			}
-			$str= "SELECT * FROM {$this->table} WHERE ".implode(" AND ", $par);
+			$str.=" WHERE ".implode(" AND ", $par);
+			// $str= "SELECT * FROM {$this->table} A WHERE ".implode(" AND ", $par);
 		}
 		$res= $this->executeStandardQuery($str);
 		return $res;
