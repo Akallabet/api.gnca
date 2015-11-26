@@ -24,9 +24,16 @@ class Supermercati extends Model
 		$this->table= 'supermercati';
 		$this->table_model= "TableSupermercato";
 		$this->statements= array("GET_BY_NOME"=>"SELECT * FROM {$this->table} WHERE nome LIKE ? LIMIT ?,?",
+								"GET_MAX_ID_SUPERMERCATO"=>"SELECT MAX(id_supermercato) as max FROM {$this->table}",
 								"GET_BY_ID_CATENA"=>"SELECT * FROM {$this->table} WHERE id_catena= ? LIMIT ?,?",
 								"GET_BY_COMUNE"=>"SELECT * FROM {$this->table} WHERE comune LIKE ? LIMIT ?,?",
 								"GET_BY_PROVINCIA"=>"SELECT * FROM {$this->table} WHERE provincia= ? LIMIT ?,?");
+	}
+
+	function maxIdSupermercato()
+	{
+		$res= $this->executeStandardQuery($this->statements['GET_MAX_ID_SUPERMERCATO']);
+		return $res;
 	}
 
 	function getByNome($nome, $limit_from='',$limit_to='')

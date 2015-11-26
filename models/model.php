@@ -122,6 +122,35 @@ class Model
 		return $res;
 	}
 
+	public function getMaxValue($maxValue, $values, $limit_from=null, $limit_to=null)
+	{
+		$values= $this->sanitize((!is_array($values)) ? get_object_vars($values) : $values);
+		$str= "SELECT Max({$maxValue}) as max FROM {$this->table}";
+		if(count($values)>0)
+		{
+			$par= Array();
+
+			foreach ($values as $key => $value) {
+				if(is_object($value))
+				{
+					$value= get_object_vars($value);
+					$keys= array_keys($value);
+					if($keys[0]=='IN')
+					{
+						$par[]= "{$key} IN (".implode(', ', $value[$keys[0]]).")";
+					}
+				}
+				else
+				{
+					$par[]= "{$key} = {$value}";
+				}
+			}
+			$str.= " WHERE ".implode(" AND ", $par);
+		}
+		$res= $this->executeStandardQuery($str);
+		return $res;
+	}
+
 	function getAll($limit_from=null, $limit_to=null)
 	{
 		$sql= "SELECT * FROM {$this->table}";

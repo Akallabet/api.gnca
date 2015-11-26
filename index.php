@@ -12,8 +12,11 @@ $app->post('/login', function() use($app){
     $username= $req->username;
     $password= $req->password;
 	require_once("./models/users.php");
+    require_once("./models/colletta.php");
 	$obj= new Users();
-	$ret= $obj->login($username, sha1($password));
+	$colletta= new Colletta();
+
+    $ret= $obj->login($username, sha1($password));
 	if(count($ret)==1)
 	{
 	    $_SESSION['timestamp']= time();
@@ -27,7 +30,8 @@ $app->post('/login', function() use($app){
            'cognome'=>$ret[0]->cognome,
            'email'=>$ret[0]->email,
            'id_area'=>$ret[0]->id_area,
-           'telefono'=>$ret[0]->telefono
+           'telefono'=>$ret[0]->telefono,
+           'colletta'=>$colletta->getActive()[0]
         );
         $token=sha1($ret[0]->api_key.$_SESSION['timestamp']."-");
 		echo json_encode(array('error'=>false,'token'=>$token));
@@ -35,10 +39,13 @@ $app->post('/login', function() use($app){
 	else echo json_encode(array('error'=>true));
 });
 
-$app->get('/logout', function(){
-	session_unset();
-	session_destroy();
-	echo json_encode(array('error'=>false));
+$app->get('/:token/logout', function($token){
+    if(checkPermissions($token))
+    {
+        session_unset();
+    	session_destroy();
+        echo json_encode(array('error'=>false));
+    }
 });
 
 $app->get('/:token/get/user', function ($token) {
@@ -54,150 +61,182 @@ $app->get('/:token/get/user', function ($token) {
 function doAction($token, $method, $property, $l_start, $l_end, $values)
 {
     $ret= array();
-
-    $obj= null;
-    switch ($property) {
-        case 'carichi':
-            require_once("./models/carichi.php");
-            if(checkPermissions($token,4))
-                $obj= new Carichi();
-            break;
-        case 'prodotti':
-            require_once("./models/prodotti.php");
-            if($method=='insert')
-            {
-                foreach ($values->values as $key => $value) {
-                    $values->values[$key]->id_user= $_SESSION['id_user'];
-                }
-            }
-            if(checkPermissions($token,4))
-                $obj= new Prodotti();
-            break;
-        case 'supermercati':
-            require_once("./models/supermercati.php");
-
-            if($method=='get')
-            {
-                if($_SESSION['user']['privilegi']>1)
+    if(isset($_SESSION['user']))
+    {
+        $obj= null;
+        switch ($property) {
+            case 'carichi':
+                require_once("./models/carichi.php");
+                if(checkPermissions($token,4))
+                    $obj= new Carichi();
+                break;
+            case 'prodotti':
+                require_once("./models/prodotti.php");
+                if($method=='insert')
                 {
-                    $values->id_area= $_SESSION['user']['id_area'];
+                    foreach ($values->values as $key => $value) {
+                        $values->values[$key]->id_user= $_SESSION['id_user'];
+                    }
                 }
-            }
-            else if($method=='update' || $method=='save')
-            {
-                deleteCache();
-            }
-            if(checkPermissions($token,4))
-                $obj= new Supermercati();
-            break;
-        case 'report':
-            require_once("./models/report.php");
-
-            if($method=='get')
-            {
-                if($_SESSION['user']['privilegi']>1)
+                if(checkPermissions($token,4))
+                    $obj= new Prodotti();
+                break;
+            case 'supermercati':
+                require_once("./models/supermercati.php");
+                
+                if($method=='get')
                 {
-                    $values->id_area= $_SESSION['user']['id_area'];
+                    if($_SESSION['user']['privilegi']>1)
+                    {
+                        $values->id_area= $_SESSION['user']['id_area'];
+                    }
                 }
-            }
-            if(checkPermissions($token,4))
-                $obj= new Report();
-            break;
-        case 'comuni':
-            require_once("./models/comuni.php");
-
-            if($method=='get')
-            {
-                if($_SESSION['user']['privilegi']>1)
+                else if($method=='update')
                 {
-                    $values->id_area= $_SESSION['user']['id_area'];
+                    if($_SESSION['user']['privilegi']>1)
+                    {
+                        foreach ($values->values as $key => $value) {
+                            $values->values[$key]->id_area= $_SESSION['user']['id_area'];
+                        }
+                    }
+                    // deleteCache($_SESSION['id_user']);
+                    deleteAllCache();
                 }
-            }
-            if(checkPermissions($token,4))
-                $obj= new Comuni();
-            break;
-        case 'catene':
-            require_once("./models/catene.php");
-            if(checkPermissions($token,4))
-                $obj= new Catene();
-            break;
-        case 'capi_equipe':
-            require_once("./models/capi_equipe.php");
-            if(checkPermissions($token,4))
-                $obj= new CapiEquipe();
-            if($method=='update' || $method=='insert')
-            {
+                else if($method=='insert')
+                {
+                    $params= array("id_colletta"=>$values->values[0]->id_colletta);
+                    $sup= new Supermercati();
+
+                    $ret= call_user_func_array(array($sup, "maxIdSupermercato"), array('id_supermercato',$params, $l_start, $l_end));
+                    
+                    $i=1;
+                    foreach ($values->values as $key => $value) {
+                        $values->values[$key]->id_supermercato= $ret[0]->max+$i;
+                        $values->values[$key]->id_area= $_SESSION['user']['id_area'];
+                        $i++;
+                    }
+
+                    // deleteCache($_SESSION['id_user']);
+                    deleteAllCache();
+                }
+                if(checkPermissions($token,4))
+                    $obj= new Supermercati();
+                break;
+            case 'report':
+                require_once("./models/report.php");
+
+                if($method=='get')
+                {
+                    if($_SESSION['user']['privilegi']>1)
+                    {
+                        $values->id_area= $_SESSION['user']['id_area'];
+                    }
+                }
+                if(checkPermissions($token,4))
+                    $obj= new Report();
+                break;
+            case 'comuni':
+                require_once("./models/comuni.php");
+
+                if($method=='get')
+                {
+                    if($_SESSION['user']['privilegi']>1)
+                    {
+                        $values->id_area= $_SESSION['user']['id_area'];
+                    }
+                }
+                if(checkPermissions($token,4))
+                    $obj= new Comuni();
+                break;
+            case 'catene':
+                require_once("./models/catene.php");
+                if(checkPermissions($token,4))
+                    $obj= new Catene();
+                break;
+            case 'capi_equipe':
+                require_once("./models/capi_equipe.php");
+                if(checkPermissions($token,4))
+                    $obj= new CapiEquipe();
+                if($method=='update' || $method=='insert')
+                {
+                    if($_SESSION['user']['privilegi']==1)
+                    {
+                        // deleteCache($_SESSION['id_user']);
+                        deleteAllCache();
+                    }
+                }
+                break;
+            case 'capi_equipe_supermercati':
+                require_once("./models/capi_equipe_supermercati.php");
+                if(checkPermissions($token,4))
+                    $obj= new CapiEquipeSupermercati();
+                break;
+            case 'aree':
+                require_once("./models/aree.php");
                 if($_SESSION['user']['privilegi']==1)
                 {
-                    deleteCache();
+                    $obj= new Aree();
+                    if($method=='update')
+                    {
+                        deleteCache($_SESSION['id_user']);
+                    }
                 }
-            }
-            break;
-        case 'capi_equipe_supermercati':
-            require_once("./models/capi_equipe_supermercati.php");
-            if(checkPermissions($token,4))
-                $obj= new CapiEquipeSupermercati();
-            break;
-        case 'aree':
-            require_once("./models/aree.php");
-            if($_SESSION['user']['privilegi']==1)
-            {
-                $obj= new Aree();
+                break;
+            case 'colletta':
+                require_once("./models/colletta.php");
+                if(checkPermissions($token,4))
+                    $obj= new Colletta();
                 if($method=='update')
                 {
-                    deleteCache();
+                    if($_SESSION['user']['privilegi']==1)
+                    {
+                        deleteCache($_SESSION['id_user']);
+                    }
                 }
-            }
-            break;
-        case 'colletta':
-            require_once("./models/colletta.php");
-            if(checkPermissions($token,4))
-                $obj= new Colletta();
-            if($method=='update')
-            {
-                if($_SESSION['user']['privilegi']==1)
-                {
-                    deleteCache();
-                }
-            }
-            break;
-        default:
+                break;
+            default:
 
-            break;
-    }
-    $mtime= ((3600)*1)*1000;
-
-    if($obj instanceof Model)
-    {
-        //Cache control
-        if($method=='get' &&
-            ($property=='supermercati' ||
-             $property=='capi_equipe' ||
-             $property=='comuni' ||
-             $property=='provincie' ||
-             $property=='catene' ||
-             $property=='aree' ||
-             $property=='regioni')
-        )
-        {
-            $strin=stringify($values);
-            $filename= 'resources/cache/'.md5("{$token}{$property}{$strin}{$l_start}{$l_end}".".js");
-
-            if (file_exists($filename)) {
-                $ret= json_decode(file_get_contents($filename));
-            } else {
-                $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
-            }
-            $fp = fopen($filename, 'w');
-            fwrite($fp, json_encode($ret, true));
-            fclose($fp);
+                break;
         }
-        else
-            $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
-    }
-    else $ret= array('error'=>'Non hai i permessi disponibili per questa azione!');
+        $mtime= ((3600)*1)*1000;
 
-    echo json_encode(array($property=>$ret));
+        if($obj instanceof Model)
+        {
+            //Cache control
+            if($method=='get' &&
+                ($property=='supermercati' ||
+                 $property=='capi_equipe' ||
+                 $property=='comuni' ||
+                 $property=='provincie' ||
+                 $property=='catene' ||
+                 $property=='aree' ||
+                 $property=='regioni')
+            )
+            {
+                $strin=stringify($values);
+                $filename= "resources/cache/{$_SESSION['id_user']}/".md5("{$token}{$property}{$strin}{$l_start}{$l_end}").".js";
+                
+                if (file_exists($filename)) {
+                    $ret= json_decode(file_get_contents($filename));
+                } else {
+                    $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
+                }
+                $fp = fopen($filename, 'w');
+                fwrite($fp, json_encode($ret, true));
+                
+                fclose($fp);
+            }
+            else
+                $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
+        }
+        else $ret= array('error'=>'Non hai i permessi disponibili per questa azione!');
+
+        echo json_encode(array($property=>$ret));
+    }
+    else
+    {
+        echo json_encode(array('error'=>true));
+    }
 }
 
 //Get with limits
@@ -238,20 +277,35 @@ $app->get('/:token/info/update/:year', function($token, $year) use($app){
     if(checkPermissions($token,1))
     {
         $res=updateFiles($year);
-        deleteCache();
+        deleteCache($_SESSION['id_user']);
     }
     echo json_encode(array("result"=>$res));
 });
 
-$app->get('/:token/cache/delete', function($token){
+$app->get('/:token/cache/delete/:all', function($token, $all){
     $res= false;
-    if(checkPermissions($token,1))
+
+    if($all==1)
     {
-        deleteCache();
-        $res=true;
+        if(checkPermissions($token,1))
+        {
+            deleteAllCache();
+            $res=true;
+        }
+    }
+    else
+    {
+        deleteCache($_SESSION['id_user']);
     }
     echo json_encode(array("result"=>$res));
 });
+
+function deleteAllCache()
+{
+    for ($i=1; $i < 23; $i++) { 
+        deleteCache($i);
+    }
+}
 
 $app->get('/:token/files/:year', function($token, $year){
     echo json_encode(array("files"=>getUploadedFiles()));
@@ -259,7 +313,7 @@ $app->get('/:token/files/:year', function($token, $year){
 
 $app->post('/:token/files/:year', function($token, $year){
     move_uploaded_file($_FILES[$year]["tmp_name"],"resources/uploaded/{$year}/".$_FILES[$year]["name"]);
-    deleteCache();
+    deleteCache($_SESSION['id_user']);
     echo json_encode(array("files"=>getUploadedFiles()));
 });
 
@@ -287,9 +341,9 @@ function stringify($inJSON)
     return $ret;
 }
 
-function deleteCache()
+function deleteCache($id)
 {
-    $files = glob('resources/cache/*'); // get all file names
+    $files = glob("resources/cache/{$id}/*"); // get all file names
     foreach($files as $file){ // iterate files
       if(is_file($file))
         unlink($file); // delete file

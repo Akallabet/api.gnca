@@ -47,6 +47,7 @@ class Prodotti extends Model
         (NULL ,  '{$id_supermercato}',  'RISO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
         (NULL ,  '{$id_supermercato}',  'ZUCCHERO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
         (NULL ,  '{$id_supermercato}',  'LATTE',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
+        (NULL ,  '{$id_supermercato}',  'BISCOTTI',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
         (NULL ,  '{$id_supermercato}',  'VARIE',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP);";
 
         $res= $this->executeStandardQuery($sql);

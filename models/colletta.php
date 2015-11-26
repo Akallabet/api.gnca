@@ -23,5 +23,12 @@ class Colletta extends Model
 		$this->table= 'colletta';
 		$this->table_model= "TableColletta";
 	}
+
+	function getActive()
+	{
+		$query= "SELECT * FROM {$this->table} WHERE attiva='1'";
+		$res= $this->executeStandardQuery($query);
+		return $res;
+	}
 }
 ?>
