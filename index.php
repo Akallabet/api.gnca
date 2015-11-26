@@ -39,7 +39,7 @@ $app->post('/login', function() use($app){
 	else echo json_encode(array('error'=>true));
 });
 
-$app->get('/:token/logout', function($token){
+$app->get('/logout', function($token){
     if(checkPermissions($token))
     {
         session_unset();
