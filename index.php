@@ -39,13 +39,10 @@ $app->post('/login', function() use($app){
 	else echo json_encode(array('error'=>true));
 });
 
-$app->get('/logout', function($token){
-    if(checkPermissions($token))
-    {
-        session_unset();
-    	session_destroy();
-        echo json_encode(array('error'=>false));
-    }
+$app->get('/logout', function(){
+    session_unset();
+	session_destroy();
+    echo json_encode(array('error'=>false));
 });
 
 $app->get('/:token/get/user', function ($token) {
