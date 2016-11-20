@@ -6,7 +6,7 @@ class Connector
 	//local
 	private $DB_HOST = 'localhost';
 	private $DB_USER = 'colletta';
-	private $DB_PASS = '171882109';
+	private $DB_PASS = '1a2b3c4d';
 
 	//remote
 	//private $DB_HOST = '192.186.204.169';

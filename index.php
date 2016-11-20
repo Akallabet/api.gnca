@@ -78,9 +78,14 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                 if(checkPermissions($token,4))
                     $obj= new Prodotti();
                 break;
+            case 'prodotti_tipi':
+                require_once("./models/prodotti_tipi.php");
+                if(checkPermissions($token,4))
+                    $obj= new ProdottiTipi();
+                break;
             case 'supermercati':
                 require_once("./models/supermercati.php");
-                
+
                 if($method=='get')
                 {
                     if($_SESSION['user']['privilegi']>1)
@@ -105,7 +110,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                     $sup= new Supermercati();
 
                     $ret= call_user_func_array(array($sup, "maxIdSupermercato"), array('id_supermercato',$params, $l_start, $l_end));
-                    
+
                     $i=1;
                     foreach ($values->values as $key => $value) {
                         $values->values[$key]->id_supermercato= $ret[0]->max+$i;
@@ -212,7 +217,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
             {
                 $strin=stringify($values);
                 $filename= "resources/cache/{$_SESSION['id_user']}/".md5("{$token}{$property}{$strin}{$l_start}{$l_end}").".js";
-                
+
                 if (file_exists($filename)) {
                     $ret= json_decode(file_get_contents($filename));
                 } else {
@@ -220,7 +225,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                 }
                 $fp = fopen($filename, 'w');
                 fwrite($fp, json_encode($ret, true));
-                
+
                 fclose($fp);
             }
             else
@@ -299,7 +304,7 @@ $app->get('/:token/cache/delete/:all', function($token, $all){
 
 function deleteAllCache()
 {
-    for ($i=1; $i < 23; $i++) { 
+    for ($i=1; $i < 23; $i++) {
         deleteCache($i);
     }
 }
