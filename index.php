@@ -228,8 +228,9 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
 
                 fclose($fp);
             }
-            else
-                $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
+            else {
+              $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
+            }
         }
         else $ret= array('error'=>'Non hai i permessi disponibili per questa azione!');
 

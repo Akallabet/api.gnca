@@ -32,27 +32,6 @@ class Prodotti extends Model
                                 "GET_BY_ID_USER"=>"SELECT * FROM {$this->table} WHERE A.id_user LIKE ? LIMIT ?,?");
 	}
 
-    function addNewCarico($id_supermercato,$carico, $id_user)
-    {
-        $sql= "INSERT INTO  {$this->table} (id ,id_supermercato ,prodotto ,kg ,scatole ,carico ,id_user ,ultima_modifica)
-        VALUES
-        (NULL ,  '{$id_supermercato}',  'OLIO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'OMOGENIZZATI',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'ALIMENTI INFANZIA',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'TONNO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'CARNE IN SCATOLA',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'PELATI',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'LEGUMI',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'PASTA',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'RISO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'ZUCCHERO',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'LATTE',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP),
-        (NULL ,  '{$id_supermercato}',  'VARIE',  '0',  '0',  '{$carico}',  '{$id_user}', CURRENT_TIMESTAMP);";
-
-        $res= $this->executeStandardQuery($sql);
-        return $res;
-    }
-
     function getByIdSupermercato($id_supermercato, $limit_from='', $limit_to='')
     {
         $id_supermercato= $this->sanitize($id_supermercato);
