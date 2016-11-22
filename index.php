@@ -161,11 +161,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                     $obj= new CapiEquipe();
                 if($method=='update' || $method=='insert')
                 {
-                    if($_SESSION['user']['privilegi']==1)
-                    {
-                        // deleteCache($_SESSION['id_user']);
-                        deleteAllCache();
-                    }
+                    deleteCache($_SESSION['id_user']);
                 }
                 break;
             case 'capi_equipe_supermercati':
@@ -207,7 +203,6 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
             //Cache control
             if($method=='get' &&
                 ($property=='supermercati' ||
-                 $property=='capi_equipe' ||
                  $property=='comuni' ||
                  $property=='provincie' ||
                  $property=='catene' ||
