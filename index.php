@@ -217,6 +217,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                 if (file_exists($filename)) {
                     $ret= json_decode(file_get_contents($filename));
                 } else {
+                    if ($property =='supermercati' && property_exists($values, 'id_area')) $method = 'getByIdArea';
                     $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
                 }
                 $fp = fopen($filename, 'w');

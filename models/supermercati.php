@@ -27,12 +27,34 @@ class Supermercati extends Model
 								"GET_MAX_ID_SUPERMERCATO"=>"SELECT MAX(id_supermercato) as max FROM {$this->table}",
 								"GET_BY_ID_CATENA"=>"SELECT * FROM {$this->table} WHERE id_catena= ? LIMIT ?,?",
 								"GET_BY_COMUNE"=>"SELECT * FROM {$this->table} WHERE comune LIKE ? LIMIT ?,?",
+								"GET_BY_ID_AREA"=>"SELECT * FROM `supermercati_aree` A JOIN {$this->table} B ON A.id_supermercato = B.id WHERE A.id_area = ? AND B.id_colletta= ? LIMIT ?,?",
+								"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM `supermercati_aree` A JOIN {$this->table} B ON A.id_supermercato = B.id WHERE A.id_area = ? AND B.id_colletta= ?",
 								"GET_BY_PROVINCIA"=>"SELECT * FROM {$this->table} WHERE provincia= ? LIMIT ?,?");
 	}
 
 	function maxIdSupermercato()
 	{
 		$res= $this->executeStandardQuery($this->statements['GET_MAX_ID_SUPERMERCATO']);
+		return $res;
+	}
+
+	function getByIdArea($params, $limit_from='',$limit_to='')
+	{
+		$id_area= $this->sanitize($params->id_area);
+		$id_colletta = $this->sanitize($params->id_colletta);
+        if($limit_from!='')
+        {
+            $statement= $this->connector->connection->prepare($this->statements['GET_BY_ID_AREA']);
+
+            $statement->bind_param("ssii",$id_area, $id_colletta, $limit_from, $limit_to);
+            $res= $this->executePreparedQuery($statement);
+        }
+        else
+        {
+            $statement= $this->connector->connection->prepare($this->statements['GET_BY_ID_AREA_NO_LIMITS']);
+            $statement->bind_param("ss",$id_area, $id_colletta);
+            $res= $this->executePreparedQuery($statement);
+        }
 		return $res;
 	}
 
