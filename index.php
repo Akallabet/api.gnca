@@ -408,67 +408,36 @@ function getFileCSvContent($filename)
 
 function updateFiles()
 {
-    $ret= true;
-
-    // require_once("./models/comuni.php");
-    // require_once("./models/catene.php");
-    // require_once("./models/colletta.php");
+    require_once("./models/connection.php");
     require_once("./models/supermercati.php");
-    // require_once("./models/capi_equipe.php");
-    // require_once("./models/capi_equipe_supermercati.php");
 
-    //Database
-    //$comuni= call_user_func_array(array(new Comuni(), 'get'), array(array()));
-    //$catene= call_user_func_array(array(new Catene(), 'get'), array(array()));
-    //$capi_equipe= call_user_func_array(array(new CapiEquipe(), 'get'), array(array()));
-    // $colletta= call_user_func_array(array(new Colletta(), 'get'), array(array("anno"=>$year)));
+    $connector = new Connector();
 
-    //Files
-    // $catene= getFileCSvContent("resources/uploaded/{$year}/catene.csv");
-    // $capi_equipe= getFileCSvContent("resources/uploaded/{$year}/capi_equipe.csv");
+    $ret= true;
     $supermercati= getFileCSvContent("resources/uploaded/supermercati.csv");
-    // $capi_equipe_supermercati= new stdClass();
-    // $capi_equipe_supermercati->values= array();
-
     $params= array("id_colletta"=>7);
     $sup= new Supermercati();
-
+    $columns= array();
+    $first = true;
     $ret= call_user_func_array(array($sup, "maxIdSupermercato"), array('id_supermercato',$params));
+    $queryValues = '';
     $i=1;
     foreach ($supermercati->values as $key => $supermercato) {
-        //$found= false;
-        /*
-        foreach ($comuni as $comune) {
-            if('"'.$comune->nome.'"'==$supermercato["comune"])
-            {
-                $supermercato["id_comune"]= $comune->id;
-                $found= true;
-                break;
-            }
-        }
-        if(!$found) $supermercato["id_comune"]= "NULL";
-
-        $supermercato["id_diocesi"]= "NULL";
-        $supermercato["id_area"]= 1;
-        */
-        // $supermercato["id_colletta"]= '"'.$colletta[0]->id.'"';
-
-        //Setting Capi_equipe_supermercati
-        //$resp= is_numeric($supermercato["id_capo_equipe"]);
-        // if($supermercato["id_capo_equipe"]!='""')
-        //     $capi_equipe_supermercati->values[]= array("id_capo_equipe"=>$supermercato["id_capo_equipe"], "id_supermercato"=>$supermercato["id"]);
-        // unset($supermercato["id_capo_equipe"]);
         $supermercato['id']= 'NULL';
         $supermercato['id_supermercato']= $ret[0]->max+$i;
+        $supermercato['id_colletta']= 7;
         $supermercati->values[$key]= $supermercato;
-        // call_user_func_array(array(new Supermercati(), 'insertOrUpdate'), array($supermercato));
+        if ($first) {
+          $columns= array_keys($supermercato);
+          $first = false;
+        }
+        $queryValues.= "(".implode(',', $supermercato)."),";
         $i++;
     }
-    // call_user_func_array(array(new Catene(), 'insertOrUpdate'), array($catene));
-    // call_user_func_array(array(new CapiEquipe(), 'insertOrUpdate'), array($capi_equipe));
-    print_r($supermercati);
-    call_user_func_array(array(new Supermercati(), 'insertOrUpdate'), array($supermercati));
-    // call_user_func_array(array(new CapiEquipeSupermercati(), 'insert'), array($capi_equipe_supermercati));
+    $query = trim("INSERT INTO supermercati (".implode(',', $columns).") VALUES ".$queryValues, ',');
+    print_r($query);
+    // $connector->connection->query($query);
+    // call_user_func_array(array(new Supermercati(), 'insertOrUpdate'), array($supermercati));
 
     return $ret;
 }

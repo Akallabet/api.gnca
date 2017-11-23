@@ -40,7 +40,7 @@ class Supermercati extends Model
 			"GET_BY_ID_CATENA"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE A.id_catena= ? LIMIT ?,?",
 			"GET_BY_ID_MAGAZZINO"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE A.id_magazzino= ? LIMIT ?,?",
 			"GET_BY_ID_AREA"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE A.id_area= ? LIMIT ?,?",
-			"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE A.id_area= ?",
+			"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM `supermercati_aree` A JOIN supermercati B ON A.id_area = B.id_area WHERE A.id_area = ?",
 			"GET_BY_ID_COLLETTA"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE A.id_colletta= ? LIMIT ?,?",
 			"GET_BY_ID_COMUNE"=>"SELECT * FROM {$this->table} A {$this->join_statement} WHERE B.id_comune= ? LIMIT ?,?");
 	}
