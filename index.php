@@ -273,11 +273,11 @@ $app->get('/:token/info/update/:year', function($token, $year) use($app){
     $req= json_decode($app->request()->getBody());
     $res= false;
 
-    if(checkPermissions($token,1))
-    {
+    // if(checkPermissions($token,1))
+    // {
         $res=updateFiles($year);
-        deleteCache($_SESSION['id_user']);
-    }
+        // deleteCache($_SESSION['id_user']);
+    // }
     echo json_encode(array("result"=>$res));
 });
 
@@ -314,6 +314,15 @@ $app->post('/:token/files/:year', function($token, $year){
     move_uploaded_file($_FILES[$year]["tmp_name"],"resources/uploaded/{$year}/".$_FILES[$year]["name"]);
     deleteCache($_SESSION['id_user']);
     echo json_encode(array("files"=>getUploadedFiles()));
+});
+
+$app->get('/:token/info/update-supermercati', function($token) use($app){
+    // if(checkPermissions($token,1))
+    // {
+        $res=updateFiles();
+        // deleteCache($_SESSION['id_user']);
+    // }
+    echo json_encode(array("result"=>$res));
 });
 
 $app->run();
@@ -376,57 +385,56 @@ function getFileCSvContent($filename)
         $fp = fopen($filename, "r");
         $line=0;
         $columns= array();
+        $csvArray = array();
 
-        while (($data = fgetcsv($fp, 100000, "\r")) !== FALSE) {
-            $num = count($data);
-            for($i=0; $i<count($data);$i++)
+        $isFirstLine = true;
+        while($row = fgetcsv($fp, 100000, "\r")) {
+          if ($isFirstLine) {
+            $columns= explode(";",$row[0]);
+            $isFirstLine = false;
+          } else {
+            $data = explode(";",$row[0]);
+            for($j=0;$j<count($columns);$j++)
             {
-                if($i==0)
-                {
-                    $columns= explode(";",$data[$i]);
-                }
-                else
-                {
-                    $row= explode(";",$data[$i]);
-                    //if(count($row)<6) print_r($row);
-                    for($j=0;$j<count($columns);$j++)
-                    {
-                        $contents->values[$line][$columns[$j]]= '"'.utf8_encode($row[$j]).'"';
-                    }
-                    $line++;
-                }
+              $contents->values[$line][$columns[$j]]= '"'.utf8_encode($data[$j]).'"';
             }
+            $line++;
+          }
         }
         fclose($fp);
     }
-    //print_r($contents);
     return $contents;
 }
 
-function updateFiles($year)
+function updateFiles()
 {
     $ret= true;
 
-    require_once("./models/comuni.php");
-    require_once("./models/catene.php");
-    require_once("./models/colletta.php");
+    // require_once("./models/comuni.php");
+    // require_once("./models/catene.php");
+    // require_once("./models/colletta.php");
     require_once("./models/supermercati.php");
-    require_once("./models/capi_equipe.php");
-    require_once("./models/capi_equipe_supermercati.php");
+    // require_once("./models/capi_equipe.php");
+    // require_once("./models/capi_equipe_supermercati.php");
 
     //Database
     //$comuni= call_user_func_array(array(new Comuni(), 'get'), array(array()));
     //$catene= call_user_func_array(array(new Catene(), 'get'), array(array()));
     //$capi_equipe= call_user_func_array(array(new CapiEquipe(), 'get'), array(array()));
-    $colletta= call_user_func_array(array(new Colletta(), 'get'), array(array("anno"=>$year)));
+    // $colletta= call_user_func_array(array(new Colletta(), 'get'), array(array("anno"=>$year)));
 
     //Files
-    $catene= getFileCSvContent("resources/uploaded/{$year}/catene.csv");
-    $capi_equipe= getFileCSvContent("resources/uploaded/{$year}/capi_equipe.csv");
-    $supermercati= getFileCSvContent("resources/uploaded/{$year}/supermercati.csv");
-    $capi_equipe_supermercati= new stdClass();
-    $capi_equipe_supermercati->values= array();
+    // $catene= getFileCSvContent("resources/uploaded/{$year}/catene.csv");
+    // $capi_equipe= getFileCSvContent("resources/uploaded/{$year}/capi_equipe.csv");
+    $supermercati= getFileCSvContent("resources/uploaded/supermercati.csv");
+    // $capi_equipe_supermercati= new stdClass();
+    // $capi_equipe_supermercati->values= array();
 
+    $params= array("id_colletta"=>7);
+    $sup= new Supermercati();
+
+    $ret= call_user_func_array(array($sup, "maxIdSupermercato"), array('id_supermercato',$params));
+    $i=1;
     foreach ($supermercati->values as $key => $supermercato) {
         //$found= false;
         /*
@@ -443,20 +451,24 @@ function updateFiles($year)
         $supermercato["id_diocesi"]= "NULL";
         $supermercato["id_area"]= 1;
         */
-        $supermercato["id_colletta"]= '"'.$colletta[0]->id.'"';
+        // $supermercato["id_colletta"]= '"'.$colletta[0]->id.'"';
 
         //Setting Capi_equipe_supermercati
         //$resp= is_numeric($supermercato["id_capo_equipe"]);
-        if($supermercato["id_capo_equipe"]!='""')
-            $capi_equipe_supermercati->values[]= array("id_capo_equipe"=>$supermercato["id_capo_equipe"], "id_supermercato"=>$supermercato["id"]);
-        unset($supermercato["id_capo_equipe"]);
+        // if($supermercato["id_capo_equipe"]!='""')
+        //     $capi_equipe_supermercati->values[]= array("id_capo_equipe"=>$supermercato["id_capo_equipe"], "id_supermercato"=>$supermercato["id"]);
+        // unset($supermercato["id_capo_equipe"]);
+        $supermercato['id']= 'NULL';
+        $supermercato['id_supermercato']= $ret[0]->max+$i;
         $supermercati->values[$key]= $supermercato;
+        // call_user_func_array(array(new Supermercati(), 'insertOrUpdate'), array($supermercato));
+        $i++;
     }
-    call_user_func_array(array(new Catene(), 'insertOrUpdate'), array($catene));
-    call_user_func_array(array(new CapiEquipe(), 'insertOrUpdate'), array($capi_equipe));
-    //print_r($supermercati);
+    // call_user_func_array(array(new Catene(), 'insertOrUpdate'), array($catene));
+    // call_user_func_array(array(new CapiEquipe(), 'insertOrUpdate'), array($capi_equipe));
+    print_r($supermercati);
     call_user_func_array(array(new Supermercati(), 'insertOrUpdate'), array($supermercati));
-    call_user_func_array(array(new CapiEquipeSupermercati(), 'insert'), array($capi_equipe_supermercati));
+    // call_user_func_array(array(new CapiEquipeSupermercati(), 'insert'), array($capi_equipe_supermercati));
 
     return $ret;
 }
