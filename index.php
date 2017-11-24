@@ -302,8 +302,9 @@ $app->get('/:token/cache/delete/:all', function($token, $all){
 
 function deleteAllCache()
 {
-    for ($i=1; $i < 23; $i++) {
-        deleteCache($i);
+    $files = scandir("resources/cache");
+    for ($i=2; $i < count($files); $i++) {
+        deleteCache($files[$i]);
     }
 }
 
