@@ -35,25 +35,10 @@ class Comuni extends Model
 	function get($values, $limit_from=null, $limit_to=null)
 	{
 		$values= $this->sanitize((!is_array($values)) ? get_object_vars($values) : $values);
-		$str= "SELECT {$this->select_statement} FROM {$this->table} A {$this->join_statement}";
-		if(count($values)>0)
-		{
-			$par= Array();
-			foreach ($values as $key => $value) {
-				if(is_object($value))
-				{
-					$value= get_object_vars($value);
-					$keys= array_keys($value);
-					if($keys[0]=='IN')
-					{
-						$par[]= "{$key} IN (".implode(', ', $value[$keys[0]]).")";
-					}
-				}
-				else
-					$par[]= "A.{$key} = {$value}";
-			}
-			$str.=" WHERE ".implode(" AND ", $par);
-			// $str= "SELECT * FROM {$this->table} A WHERE ".implode(" AND ", $par);
+		if (array_key_exists('id_area', $values)) {
+			$str= "SELECT A.id, A.nome, A.id_provincia, B.nome as provincia, C.id_area FROM comuni A JOIN province B ON A.id_provincia=B.id JOIN comuni_aree C ON A.id=C.id_comune WHERE C.id_area=".$values['id_area'];
+		} else {
+			$str= "SELECT A.id, A.nome, A.id_provincia, B.nome as provincia, A.id_area FROM comuni A JOIN province B ON A.id_provincia=B.id";
 		}
 		$res= $this->executeStandardQuery($str);
 		return $res;
