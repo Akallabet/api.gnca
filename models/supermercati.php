@@ -55,6 +55,15 @@ class Supermercati extends Model
             $statement->bind_param("ss",$id_area, $id_colletta);
             $res= $this->executePreparedQuery($statement);
         }
+		for ($i=0; $i < count($res); $i++) {
+			$res[$i]->id = $res[$i]->id."";
+			$res[$i]->id_catena = $res[$i]->id_catena."";
+			$res[$i]->id_area = $res[$i]->id_area."";
+			$res[$i]->id_supermercato = $res[$i]->id_supermercato."";
+			$res[$i]->id_colletta = $res[$i]->id_colletta."";
+			$res[$i]->id_comune = $res[$i]->id_comune."";
+			$res[$i]->id_provincia = $res[$i]->id_provincia."";
+		}
 		return $res;
 	}
 
