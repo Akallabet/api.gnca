@@ -30,27 +30,17 @@ class Report extends Model
 	public function get($values, $limit_from=null, $limit_to=null)
 	{
 		$values= $this->sanitize((!is_array($values)) ? get_object_vars($values) : $values);
-		$str= "SELECT * FROM {$this->table1}";
-		if(count($values)>0)
-		{
-			$par= Array();
-
-			foreach ($values as $key => $value) {
-				if(is_object($value))
-				{
-					$value= get_object_vars($value);
-					$keys= array_keys($value);
-					if($keys[0]=='IN')
-					{
-						$par[]= "{$key} IN (".implode(', ', $value[$keys[0]]).")";
-					}
-				}
-				else
-				{
-					$par[]= "{$key} = {$value}";
-				}
-			}
-			$str= "SELECT * FROM {$this->table1} WHERE ".implode(" AND ", $par);
+		$str = "SELECT * FROM {$this->table1} A";
+		if (array_key_exists('id_area', $values)) {
+			$str.=" JOIN `supermercati_aree` B ON B.id_supermercato = A.id WHERE B.id_area = ".$values['id_area']." AND A.id_colletta=".$values['id_colletta'];
+		} else {
+			$str.= " WHERE A.id_colletta=".$values['id_colletta'];
+		}
+		if (array_key_exists('id_comune', $values)) {
+			$str.= " AND A.id_comune=".$values['id_comune'];
+		}
+		if (array_key_exists('id_provincia', $values)) {
+			$str.= " AND A.id_provincia=".$values['id_provincia'];
 		}
 		$res= $this->executeStandardQuery($str);
 
