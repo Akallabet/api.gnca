@@ -30,7 +30,7 @@ class Report extends Model
 	public function get($values, $limit_from=null, $limit_to=null)
 	{
 		$values= $this->sanitize((!is_array($values)) ? get_object_vars($values) : $values);
-		$str = "SELECT * FROM {$this->table1} A";
+		$str = "SELECT  A.id, A.id_supermercato, A.id_colletta, A.id_catena, A.indirizzo, A.id_comune, A.id_provincia, A.id_diocesi, A.nome, A.id_magazzino, A.id_area FROM {$this->table1} A";
 		if (array_key_exists('id_area', $values)) {
 			$str.=" JOIN `supermercati_aree` B ON B.id_supermercato = A.id WHERE B.id_area = ".$values['id_area']." AND A.id_colletta=".$values['id_colletta'];
 		} else {
