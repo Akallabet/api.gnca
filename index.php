@@ -108,9 +108,9 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                 {
                     $params= array("id_colletta"=>$values->values[0]->id_colletta);
                     $sup= new Supermercati();
-
+		    
                     $ret= call_user_func_array(array($sup, "maxIdSupermercato"), array('id_supermercato',$params, $l_start, $l_end));
-
+		    
                     $i=1;
                     foreach ($values->values as $key => $value) {
                         $values->values[$key]->id= 'NULL';
@@ -220,7 +220,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
                     if ($property =='supermercati' && property_exists($values, 'id_area')) $method = 'getByIdArea';
                     $ret= call_user_func_array(array($obj, $method), array($values, $l_start, $l_end));
                 }
-                $fp = fopen($filename, 'w');
+                $fp = fopen($filename, 'w+');
                 fwrite($fp, json_encode($ret, true));
 
                 fclose($fp);

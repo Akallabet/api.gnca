@@ -27,8 +27,8 @@ class Supermercati extends Model
 								"GET_MAX_ID_SUPERMERCATO"=>"SELECT MAX(id_supermercato) as max FROM {$this->table}",
 								"GET_BY_ID_CATENA"=>"SELECT * FROM {$this->table} WHERE id_catena= ? LIMIT ?,?",
 								"GET_BY_COMUNE"=>"SELECT * FROM {$this->table} WHERE comune LIKE ? LIMIT ?,?",
-								"GET_BY_ID_AREA"=>"SELECT * FROM `supermercati_aree` A JOIN {$this->table} B ON A.id_supermercato = B.id WHERE A.id_area = ? AND B.id_colletta= ? LIMIT ?,?",
-								"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM `supermercati_aree` A JOIN {$this->table} B ON A.id_supermercato = B.id WHERE A.id_area = ? AND B.id_colletta= ?",
+								"GET_BY_ID_AREA"=>"SELECT * FROM {$this->table} WHERE id_area = ? AND id_colletta= ? LIMIT ?,?",
+								"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM {$this->table} WHERE id_area = ? AND id_colletta= ?",
 								"GET_BY_PROVINCIA"=>"SELECT * FROM {$this->table} WHERE provincia= ? LIMIT ?,?");
 	}
 
