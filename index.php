@@ -322,6 +322,7 @@ $app->run();
 
 function checkPermissions($token,$level=100)
 {
+    print_r($_SESSION['user']);
 	$ret= true;
 	if(isset($_SESSION['user']) && sha1($_SESSION['user']['api_key'].$_SESSION['timestamp']."-")==$token)
     {
