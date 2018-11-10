@@ -27,6 +27,7 @@ class Supermercati extends Model
 								"GET_MAX_ID_SUPERMERCATO"=>"SELECT MAX(id_supermercato) as max FROM {$this->table}",
 								"GET_BY_ID_CATENA"=>"SELECT * FROM {$this->table} WHERE id_catena= ? LIMIT ?,?",
 								"GET_BY_COMUNE"=>"SELECT * FROM {$this->table} WHERE comune LIKE ? LIMIT ?,?",
+								"GET"=>"SELECT * FROM {$this->table} WHERE id_colletta= ?",
 								"GET_BY_ID_AREA"=>"SELECT * FROM {$this->table} WHERE id_area = ? AND id_colletta= ? LIMIT ?,?",
 								"GET_BY_ID_AREA_NO_LIMITS"=>"SELECT * FROM {$this->table} WHERE id_area = ? AND id_colletta= ?",
 								"GET_BY_PROVINCIA"=>"SELECT * FROM {$this->table} WHERE provincia= ? LIMIT ?,?");
@@ -44,6 +45,25 @@ class Supermercati extends Model
 			$this->executeStandardQuery("INSERT INTO supermercati_aree (id_area, id_supermercato) SELECT id_area, id FROM supermercati WHERE id=".$supermercato['id']);
 		}
 		return $supermercato;
+	}
+
+	function get($params)
+	{
+		$id_colletta = $this->sanitize($params->id_colletta);
+		$statement= $this->connector->connection->prepare($this->statements['GET']);
+		$statement->bind_param("ss", $id_colletta);
+		$res= $this->executePreparedQuery($statement);
+    
+		for ($i=0; $i < count($res); $i++) {
+			$res[$i]->id = $res[$i]->id."";
+			$res[$i]->id_catena = $res[$i]->id_catena."";
+			$res[$i]->id_area = $res[$i]->id_area."";
+			$res[$i]->id_supermercato = $res[$i]->id_supermercato."";
+			$res[$i]->id_colletta = $res[$i]->id_colletta."";
+			$res[$i]->id_comune = $res[$i]->id_comune."";
+			$res[$i]->id_provincia = $res[$i]->id_provincia."";
+		}
+		return $res;
 	}
 
 	function getByIdArea($params, $limit_from='',$limit_to='')
