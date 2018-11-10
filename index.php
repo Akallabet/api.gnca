@@ -49,7 +49,7 @@ $app->get('/:token/get/user', function ($token) {
     $ret= array();
     $error= false;
     $actions= array();
-    if(checkPermissions($token))
+if(checkPermissions($token))
         $ret= $_SESSION['user'];
     else $error= true;
     echo json_encode(array('user'=>$ret,'error'=>$error));
@@ -322,7 +322,6 @@ $app->run();
 
 function checkPermissions($token,$level=100)
 {
-    print_r($_SESSION['user']);
 	$ret= true;
 	if(isset($_SESSION['user']) && sha1($_SESSION['user']['api_key'].$_SESSION['timestamp']."-")==$token)
     {
