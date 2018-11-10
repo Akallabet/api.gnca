@@ -47,7 +47,7 @@ class Supermercati extends Model
 		return $supermercato;
 	}
 
-	function get($params)
+	function get($params, $limit_from='',$limit_to='')
 	{
 		$id_colletta = $this->sanitize($params->id_colletta);
 		$statement= $this->connector->connection->prepare($this->statements['GET']);
