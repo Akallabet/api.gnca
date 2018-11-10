@@ -51,7 +51,7 @@ class Supermercati extends Model
 	{
 		$id_colletta = $this->sanitize($params->id_colletta);
 		$statement= $this->connector->connection->prepare($this->statements['GET']);
-		$statement->bind_param("ss", $id_colletta);
+		$statement->bind_param("s", $id_colletta);
 		$res= $this->executePreparedQuery($statement);
     
 		for ($i=0; $i < count($res); $i++) {
