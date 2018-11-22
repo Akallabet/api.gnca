@@ -39,14 +39,6 @@ class Supermercati extends Model
 		return $res;
 	}
 
-	function insert($parameters, $duplicate=false) {
-		$supermercato = parent::insert($parameters, $duplicate);
-		if (array_key_exists('id', $supermercato)) {
-			$this->executeStandardQuery("INSERT INTO supermercati_aree (id_area, id_supermercato) SELECT id_area, id FROM supermercati WHERE id=".$supermercato['id']);
-		}
-		return $supermercato;
-	}
-
 	function get($params, $limit_from='',$limit_to='')
 	{
 		$id_colletta = $this->sanitize($params->id_colletta);
