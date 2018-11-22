@@ -113,7 +113,7 @@ function doAction($token, $method, $property, $l_start, $l_end, $values)
 		    
                     $i=1;
                     foreach ($values->values as $key => $value) {
-                        $values->values[$key]->id= "NULL";
+                        unset($values->values[$key]->id);
                         $values->values[$key]->id_supermercato= $ret[0]->max+$i;
                         $values->values[$key]->id_area= $_SESSION['user']['id_area'];
                         $i++;
